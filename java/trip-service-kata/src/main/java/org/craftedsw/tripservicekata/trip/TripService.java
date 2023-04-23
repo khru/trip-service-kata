@@ -11,22 +11,22 @@ public class TripService {
 
 	public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
 		List<Trip> tripList = new ArrayList<Trip>();
-		User loggedUser = this.getLoggedUser();
+		User loggedInUser = this.getLoggedUser();
 		boolean isFriend = false;
-		if (loggedUser != null) {
-			for (User friend : user.getFriends()) {
-				if (friend.equals(loggedUser)) {
-					isFriend = true;
-					break;
-				}
-			}
-			if (isFriend) {
-				tripList = tripsBy(user);
-			}
-			return tripList;
-		} else {
+		if (null == loggedInUser) {
 			throw new UserNotLoggedInException();
 		}
+
+		for (User friend : user.getFriends()) {
+			if (friend.equals(loggedInUser)) {
+				isFriend = true;
+				break;
+			}
+		}
+		if (isFriend) {
+			tripList = tripsBy(user);
+		}
+		return tripList;
 	}
 
 	List<Trip> tripsBy(User user) {
