@@ -11,6 +11,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TripServiceShould {
 
@@ -18,7 +20,8 @@ public class TripServiceShould {
     public static final User REGISTER_USER = new User();
     public static final Trip LONDON_TRIP = new Trip();
     public static final Trip BARCELONA_TRIP = new Trip();
-    private User loggedInUser;
+
+    public TripDAO tripDAO = mock(TripDAO.class);
 
     private TripService tripService;
     private UserBuilder userBuilder;
@@ -26,13 +29,13 @@ public class TripServiceShould {
     @BeforeEach
     public void setUp() {
         userBuilder = new UserBuilder();
-        tripService = new TestableTripService();
+        tripService = new TripService(tripDAO);
     }
 
     @Test
     public void not_allowed_not_logged_in_users() {
         UserNotLoggedInException expectedException = assertThrows(UserNotLoggedInException.class, () -> {
-            tripService.getTripsByUser(loggedInUser, GUEST);
+            tripService.getTripsByUser(REGISTER_USER, GUEST);
         });
     }
 
@@ -60,15 +63,9 @@ public class TripServiceShould {
                 .withTrips(LONDON_TRIP, BARCELONA_TRIP)
                 .build();
 
+        when(tripDAO.tripsBy(friend)).thenReturn(friend.trips());
+
         assertEquals(tripService.getTripsByUser(friend, REGISTER_USER), List.of(LONDON_TRIP, BARCELONA_TRIP));
-    }
-
-    class TestableTripService extends TripService {
-
-        @Override
-        public List<Trip> tripsBy(User user) {
-            return user.trips();
-        }
     }
 }
 
