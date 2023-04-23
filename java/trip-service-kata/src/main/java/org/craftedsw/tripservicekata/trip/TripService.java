@@ -17,11 +17,11 @@ public class TripService {
 			throw new UserNotLoggedInException();
 		}
 
-		if (user.isFriendsWith(loggedInUser)) {
-			return tripsBy(user);
+		if (!user.isFriendsWith(loggedInUser)) {
+			return Collections.emptyList();
 		}
 
-		return Collections.emptyList();
+		return tripsBy(user);
 	}
 
 	List<Trip> tripsBy(User user) {
