@@ -3,15 +3,12 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,9 +22,11 @@ public class TripServiceShould {
     private User loggedInUser;
 
     private TripService tripService;
+    private UserBuilder userBuilder;
 
     @BeforeEach
     public void setUp() {
+        userBuilder = new UserBuilder();
         tripService = new TestableTripService();
     }
 	@Test
@@ -42,11 +41,10 @@ public class TripServiceShould {
     @Test
     public void return_an_empty_trip_list_when_the_user_has_no_friends() {
 
-        User stranger = ANOTHER_USER;
-        User otherStranger = new User();
-        stranger.addFriend(otherStranger);
+        User otherStranger = userBuilder.build();
+        User stranger = userBuilder.withFriends(otherStranger).build();
 
-        loggedInUser = REGISTER_USER;
+        loggedInUser = userBuilder.build();
 
         assertEquals(tripService.getTripsByUser(stranger), Collections.emptyList());
     }
@@ -55,20 +53,20 @@ public class TripServiceShould {
     public void return_an_empty_trip_list_when_the_user_has_friends_but_not_trips() {
 
         loggedInUser = REGISTER_USER;
-        User anotherUser = ANOTHER_USER;
-        anotherUser.addFriend(loggedInUser);
+        User anotherUser = new UserBuilder()
+                .withFriends(loggedInUser)
+                .build();
 
         assertEquals(tripService.getTripsByUser(anotherUser), Collections.emptyList());
     }
 
     @Test
     public void return_a_list_of_trips_when_the_user_has_friends_and_trips() {
-
         loggedInUser = REGISTER_USER;
-        User friend = ANOTHER_USER;
-        friend.addFriend(loggedInUser);
-        friend.addTrip(LONDON_TRIP);
-        friend.addTrip(BARCELONA_TRIP);
+        User friend = new UserBuilder()
+                .withFriends(loggedInUser)
+                .withTrips(LONDON_TRIP, BARCELONA_TRIP)
+                .build();
 
         assertEquals(tripService.getTripsByUser(friend), List.of(LONDON_TRIP, BARCELONA_TRIP));
     }
