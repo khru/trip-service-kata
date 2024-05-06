@@ -2,7 +2,10 @@
     "name": "sandromancuso/trip-service-kata",
     "description": "Kata for a legacy code hands-on session. The objective is to write tests and refactor the given legacy code.",
     "type": "project",
-    "keywords": ["TripService", "kata"],
+    "keywords": [
+        "TripService",
+        "kata"
+    ],
     "require": {
         "php": ">=8.3"
     },
@@ -24,8 +27,9 @@
         "bin-dir": "bin"
     },
     "autoload": {
-        "psr-0": {
-            "": ["src/"]
+        "psr-4": {
+            "TripServiceKata\\": "src/TripServiceKata/",
+            "Test\\TripServiceKata\\": "test/Test/TripServiceKata/"
         }
     }
 }
